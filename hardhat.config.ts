@@ -100,6 +100,11 @@ export default {
       ...sharedNetworkConfig,
       url: `https://rinkeby.infura.io/v3/${INFURA_KEY}`,
     },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+      ...sharedNetworkConfig,
+      chainId: 5,
+    },
     xdai: {
       ...sharedNetworkConfig,
       url: "https://xdai.poanetwork.dev",
