@@ -57,12 +57,6 @@ yarn bench:trace
 
 ## Deployment
 
-Contracts deployment (including contract verification) is run automatically with GitHub Actions. The deployment process is triggered manually.
-Maintainers of this repository can deploy a new version of the contract in the "Actions" tab, "Deploy CoW Protocol contracts", "Run workflow". The target branch can be selected before running.
-A successful workflow results in a new PR asking to merge the deployment artifacts into the main branch.
-
-Contracts can also be deployed and verified manually as follows.
-
 ### Deploying Contracts
 
 Choose the network and gas price in wei for the deployment.
@@ -87,6 +81,15 @@ For verifying all deployed contracts:
 export ETHERSCAN_API_KEY=<Your Key>
 yarn verify:etherscan --network $NETWORK
 ```
+
+Single contracts can be verified as well, but the constructor arguments must be explicitly given to the command.
+A common example is the vault relayer contract, which is not automatically verified with the command above since it is only deployed indirectly during initialization. This contract can be manually verified with:
+
+```sh
+npx hardhat verify --network $NETWORK 0xC92E8bdf79f0507f65a392b0ab4667716BFE0110  0xBA12222222228d8Ba445958a75a0704d566BF2C8
+```
+
+The first address is the vault relayer address, the second is the deployment input (usually, the Balancer vault).
 
 #### Tenderly
 
@@ -143,17 +146,30 @@ yarn solvers command [arg ...]
 ```
 
 Here is a list of available commands.
-The commands flagged with [*] require the private key of the authentication contract owner to be available to the script, for example by exporting it with `export PK=<private key>`.
+The commands flagged with [**] require exporting the private key of the authentication contract owner, while those flagged with [*] require the address of either the owner or the manager.
+The private key can be exported with `export PK=<private key>`.
 
 1. `add $ADDRESS` [*]. Adds the address to the list of registered solvers.
 2. `remove $ADDRESS` [*]. Removes the address from the list of registered solvers.
 3. `check $ADDRESS`. Checks if the given address is in the list of registered solvers.
+3. `list`. Lists all registered solvers.
+3. `setManager $ADDRESS` [**]. Sets the manager of the authenticator to the input address.
 
 For example, adding the address `0x0000000000000000000000000000000000000042` to the solver list:
 
 ```sh
 export PK=<private key>
 yarn solvers add 0x0000000000000000000000000000000000000042
+```
+
+### Transfer Ownership
+
+There is a dedicated script to change the owner of the authenticator proxy.
+
+Usage and parameters can be seen by running:
+
+```sh
+yarn hardhat transfer-ownership --help
 ```
 
 ### Fee Withdrawals
@@ -187,3 +203,15 @@ npx hardhat decode --txhash 0xc12e5bc2ef9c116932301495738d555ea1d658977dacd6c798
 ```
 
 Note that you will be expected to have your `INFURA_KEY` exported to your environment variables.
+
+## Releases
+
+The content of this repo is published on NPM as [`@cowprotocol/contracts`](https://www.npmjs.com/package/@cowprotocol/contracts).
+
+Maintainers this repository can manually trigger a new release. The steps are as follows:
+
+1. Update the package version number in `./package.json` on branch `main`.
+
+2. On GitHub, visit the "Actions" tab, "Publish package to NPM", "Run workflow" with `main` as the target branch.
+
+Once the workflow has been executed successfully, a new NPM package version should be available as well as a new git tag named after the released version.

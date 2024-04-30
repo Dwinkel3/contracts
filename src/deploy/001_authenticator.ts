@@ -1,5 +1,5 @@
-import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { DeployFunction } from "hardhat-deploy/types";
 
 import { CONTRACT_NAMES, SALT } from "../ts/deploy";
 
@@ -18,9 +18,13 @@ const deployAuthenticator: DeployFunction = async function ({
     log: true,
     proxy: {
       owner,
-      methodName: "initializeManager",
+      execute: {
+        init: {
+          methodName: "initializeManager",
+          args: [manager],
+        },
+      },
     },
-    args: [manager],
   });
 };
 

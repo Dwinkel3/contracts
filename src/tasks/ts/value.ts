@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 
 import { BUY_ETH_ADDRESS, OrderKind } from "../../ts";
 import { Api } from "../../ts/api";
@@ -30,6 +30,11 @@ export const REFERENCE_TOKEN: Record<SupportedNetwork, ReferenceToken> = {
     symbol: "DAI",
     decimals: 18,
     address: "0x6b175474e89094c44da98b954eedeac495271d0f",
+  },
+  sepolia: {
+    symbol: "DAI",
+    decimals: 18,
+    address: "0xB4F1737Af37711e9A5890D9510c9bB60e170CB0D",
   },
   xdai: {
     // todo: replace with XDAI when native token price queries will be supported
@@ -112,4 +117,24 @@ export function formatUsdValue(
   usdReference: ReferenceToken,
 ): string {
   return formatTokenValue(amount, usdReference.decimals, 2);
+}
+
+export function formatGasCost(
+  amount: BigNumber,
+  usdAmount: BigNumber,
+  network: SupportedNetwork,
+  usdReference: ReferenceToken,
+): string {
+  switch (network) {
+    case "mainnet": {
+      return `${utils.formatEther(amount)} ETH (${formatUsdValue(
+        usdAmount,
+        usdReference,
+      )} USD)`;
+    }
+    case "xdai":
+      return `${utils.formatEther(amount)} XDAI`;
+    default:
+      return `${utils.formatEther(amount)} ETH`;
+  }
 }

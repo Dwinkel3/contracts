@@ -3,6 +3,7 @@ import "hardhat-deploy";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@tenderly/hardhat-tenderly";
+import "@nomicfoundation/hardhat-verify";
 
 import dotenv from "dotenv";
 import type { HttpNetworkUserConfig } from "hardhat/types";
@@ -22,8 +23,15 @@ const argv = yargs
 
 // Load environment variables.
 dotenv.config();
-const { INFURA_KEY, MNEMONIC, PK, REPORT_GAS, MOCHA_CONF, NODE_URL } =
-  process.env;
+const {
+  INFURA_KEY,
+  MNEMONIC,
+  PK,
+  REPORT_GAS,
+  MOCHA_CONF,
+  NODE_URL,
+  ETHERSCAN_API_KEY,
+} = process.env;
 
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
@@ -121,10 +129,19 @@ export default {
       ...sharedNetworkConfig,
       chainId: 5,
     },
+    sepolia: {
+      url: "https://ethereum-sepolia.publicnode.com",
+      ...sharedNetworkConfig,
+      chainId: 11155111,
+    },
     xdai: {
       url: "https://rpc.gnosischain.com",
       ...sharedNetworkConfig,
       chainId: 100,
+    },
+    arbitrumOne: {
+      ...sharedNetworkConfig,
+      url: "https://arb1.arbitrum.io/rpc",
     },
   },
   namedAccounts: {
@@ -148,5 +165,11 @@ export default {
     enabled: REPORT_GAS ? true : false,
     currency: "USD",
     gasPrice: 21,
+  },
+  etherscan: {
+    apiKey: {
+      sepolia: ETHERSCAN_API_KEY,
+      arbitrumOne: ETHERSCAN_API_KEY,
+    },
   },
 };
